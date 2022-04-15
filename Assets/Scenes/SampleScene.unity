@@ -343,10 +343,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8effea6b448bf540b79a42380c6092b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkWidth: 4
-  chunkLength: 4
+  chunkWidth: 8
+  chunkLength: 8
   Chunk: {fileID: 5071512032475163926, guid: 5a5a6948f25fa3e4bb6e944542278d60, type: 3}
-  NoiseScale: 0.03
+  NoiseScale: 0.08
+  debugCubes: []
 --- !u!4 &1580310335
 Transform:
   m_ObjectHideFlags: 0

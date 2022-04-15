@@ -49,12 +49,12 @@ public static class ChunkGeometry
 
     private static Vector2[] UVs =
     {
-        new Vector2(1/16f + ((1/16f) * 4), 1/16f + ((1/16f) * 15)),
-        new Vector2(1/16f + ((1/16f) * 4), 0/16f+ ((1/16f) * 15)),
-        new Vector2(0/16f + ((1/16f) * 4), 0/16f+ ((1/16f) * 15)),
-        new Vector2(0/16f + ((1/16f) * 4), 1/16f+ ((1/16f) * 15)),
-        new Vector2(1/16f + ((1/16f) * 4), 1/16f+ ((1/16f) * 15)),
-        new Vector2(0/16f + ((1/16f) * 4), 0/16f+ ((1/16f) * 15))
+        new Vector2(1/16f + ((1/16f) * 1), 1/16f + ((1/16f) * 15)),
+        new Vector2(1/16f + ((1/16f) * 1), 0/16f+ ((1/16f) * 15)),
+        new Vector2(0/16f + ((1/16f) * 1), 0/16f+ ((1/16f) * 15)),
+        new Vector2(0/16f + ((1/16f) * 1), 1/16f+ ((1/16f) * 15)),
+        new Vector2(1/16f + ((1/16f) * 1), 1/16f+ ((1/16f) * 15)),
+        new Vector2(0/16f + ((1/16f) * 1), 0/16f+ ((1/16f) * 15))
     };
     
 

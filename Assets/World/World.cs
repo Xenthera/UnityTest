@@ -1,9 +1,11 @@
+using System;
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 using static Chunk;
+using Random = UnityEngine.Random;
 
 public class World : Singleton<World>
 {
@@ -18,9 +20,12 @@ public class World : Singleton<World>
 
     public Queue<LightNode> lightBfsQueue;
 
+    public List<Vector4> debugCubes;
+
 
     protected override void Awake()
     {
+        debugCubes = new List<Vector4>();
         chunks = new Dictionary<(int, int), Chunk>();
         lightBfsQueue = new Queue<LightNode>();
 
@@ -28,14 +33,16 @@ public class World : Singleton<World>
 
         Sequence s = DOTween.Sequence();
 
+        float t1 = Time.realtimeSinceStartup;
+
         for (int i = 0; i < chunkWidth; i++)
         {
             for (int j = 0; j < chunkLength; j++)
             {
                 int x = i;
                 int y = j;
-                s.AppendCallback(() =>
-                {
+                //s.AppendCallback(() =>
+                //{
 
                     GameObject chunk = Instantiate(Chunk);
                     Chunk c = chunk.GetComponent<Chunk>();
@@ -45,11 +52,15 @@ public class World : Singleton<World>
 
                     chunk.transform.position = new Vector3(c.position.x * 16, 0, c.position.y * 16);
 
-                }).AppendInterval(0.2f);
+                //}).AppendInterval(0.01f);
                 
 
             }
         }
+
+        float t2 = Time.realtimeSinceStartup;
+
+        Bobby.Log("Time to make chunks: " + (t2 - t1) + " seconds");
     }
 
 
@@ -72,6 +83,15 @@ public class World : Singleton<World>
         
     }
 
+    private void OnDrawGizmos()
+    {
+        foreach (var pos in debugCubes)
+        {
+            Gizmos.color = new Color(pos.w / 16f, pos.w / 16f, pos.w / 16f);
+            Gizmos.DrawWireCube(new Vector3(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f), Vector3.one * 0.5f);
+        }
+    }
+
     public void UpdateLight()
     {
         while (lightBfsQueue.Count > 0)
@@ -85,8 +105,8 @@ public class World : Singleton<World>
             byte lightR = c.getLightLevelR(x, y, z);
             byte lightG = c.getLightLevelG(x, y, z);
             byte lightB = c.getLightLevelB(x, y, z);
-
-
+            
+            
            
             if (x == 0)
             {
@@ -101,7 +121,7 @@ public class World : Singleton<World>
                         qother = true;
 
                     }
-                    else if (negX.getBlock(CHUNK_WIDTH - 1, y, z) == 0 && negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) - 2 >= lightR)
+                    if (negX.getBlock(CHUNK_WIDTH - 1, y, z) == 0 && negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) - 2 >= lightR)
                     {
 
                         //c.setLightLevelR((byte)(negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
@@ -423,17 +443,29 @@ public class World : Singleton<World>
                 c.setLightLevelR((byte)(lightR - 1), x, y - 1, z);
                 qy = true;
             }
+            else
+            {
+                c.markDirty(x, y-1, z);
+            }
 
             if (y > 0 && c.getBlock(x, y - 1, z) == 0 && c.getLightLevelG(x, y - 1, z) + 2 <= lightG)
             {
                 c.setLightLevelG((byte)(lightG - 1), x, y - 1, z);
                 qy = true;
             }
+            else
+            {
+                c.markDirty(x, y-1, z);
+            }
 
             if (y > 0 && c.getBlock(x, y - 1, z) == 0 && c.getLightLevelB(x, y - 1, z) + 2 <= lightB)
             {
                 c.setLightLevelB((byte)(lightB - 1), x, y - 1, z);
                 qy = true;
+            }
+            else
+            {
+                c.markDirty(x, y-1, z);
             }
 
             if (qy)
@@ -449,16 +481,19 @@ public class World : Singleton<World>
                 qy = true;
             }
 
+
             if (y < CHUNK_HEIGHT - 1 && c.getBlock(x, y + 1, z) == 0 && c.getLightLevelG(x, y + 1, z) + 2 <= lightG)
             {
                 c.setLightLevelG((byte)(lightG - 1), x, y + 1, z);
                 qy = true;
             }
+
             if (y < CHUNK_HEIGHT - 1 && c.getBlock(x, y + 1, z) == 0 && c.getLightLevelB(x, y + 1, z) + 2 <= lightB)
             {
                 c.setLightLevelB((byte)(lightB - 1), x, y + 1, z);
                 qy = true;
             }
+
 
             if (qy)
             {

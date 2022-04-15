@@ -50,7 +50,7 @@ public class Chunk : MonoBehaviour
 
     bool[] subChunkDirtyList;
 
-    Color[] colors = new Color[] { new Color(1, 1, 0), new Color(0, 1, 0) };//, new Color(0, 0, 1)};
+    private Color[] colors = new Color[] {new Color(1, 0, 0),new Color(0, 0, 1), new Color(0, 1, 0) };//, new Color(0, 0, 1)};
 
 
 
@@ -101,15 +101,15 @@ public class Chunk : MonoBehaviour
                         //if (Vector3.Distance(a, b) < 64)
                         {
                             //if (worldX == 0 && worldY == 0)
-                            //if (worldY < 64)
-                                //setBlock(1, i, j, k, false);
+                            if (worldY < 64)
+                                setBlock(1, i, j, k, false);
                         }
                     }
 
-                    //if (worldX == 0 || worldX == 127 || worldZ == 0 || worldZ == 127 || worldY == 0)
+                    if (worldX == 0 || worldX == 127 || worldZ == 0 || worldZ == 127 || worldY == 0)
                     {
-                        if (worldY < 64)
-                            setBlock(1, i, j, k, false);
+                        //if (worldY < 64)
+                            //setBlock(1, i, j, k, false);
                     }
 
                     if (worldY == 64)
@@ -118,6 +118,11 @@ public class Chunk : MonoBehaviour
                         {
                             //setBlock(1, i, j, k, false);
                         }
+                    }
+
+                    if (worldY < 4 &&  worldY > 0 && worldX > 63 && worldX < 67)
+                    {
+                        //setBlock(0, i,j,k,false);
                     }
                     //setBlock(1, i, j, k, false);
 
@@ -190,10 +195,11 @@ public class Chunk : MonoBehaviour
 
                     if (block == Blocks.AIR)
                     {
-                        setLightLevelR(0, i, j, k);
-                        setLightLevelG(0, i, j, k);
-                        setLightLevelB(0, i, j, k);
-                        World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
+                        //setLightLevelR(0, i, j, k);
+                        //setLightLevelG(0, i, j, k);
+                        //setLightLevelB(0, i, j, k);
+                        if(i == 0 || i == CHUNK_WIDTH || k == 0 || k == CHUNK_LENGTH)
+                            World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
                     }
 
                     if (j < 66 && Random.Range(0f, 1f) < 0.0005f)
@@ -205,8 +211,9 @@ public class Chunk : MonoBehaviour
                             Color c = colors[(int)Random.Range(0, colors.Length)];
 
                             setLightLevelR((byte)((byte)c.r * 16), i, j, k);
-                            setLightLevelG((byte)((byte)c.r * 16), i, j, k);
-                            setLightLevelB((byte)((byte)c.r * 16), i, j, k);
+                            setLightLevelG((byte)((byte)c.g * 16), i, j, k);
+                            setLightLevelB((byte)((byte)c.b * 16), i, j, k);
+                            setBlock(1, i, j, k, false);
                             World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
 
                         }
