@@ -24,6 +24,8 @@ public class World : Singleton<World>
         chunks = new Dictionary<(int, int), Chunk>();
         lightBfsQueue = new Queue<LightNode>();
 
+        Random.seed = 25;  
+
         Sequence s = DOTween.Sequence();
 
         for (int i = 0; i < chunkWidth; i++)
@@ -43,7 +45,7 @@ public class World : Singleton<World>
 
                     chunk.transform.position = new Vector3(c.position.x * 16, 0, c.position.y * 16);
 
-                }).AppendInterval(0.1f);
+                }).AppendInterval(0.2f);
                 
 
             }
@@ -58,6 +60,8 @@ public class World : Singleton<World>
             chunk.Value.gameObject.transform.position = new Vector3(chunk.Value.position.x * 16, 0, chunk.Value.position.y * 16);
             
         }
+
+
     }
 
     // Update is called once per frame
@@ -90,7 +94,6 @@ public class World : Singleton<World>
                 if (negX != null)
                 {
                     bool qother = false;
-                    bool qthis = false;
 
                     if (negX.getBlock(CHUNK_WIDTH - 1, y, z) == 0 && negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) + 2 <= lightR)
                     {
@@ -101,8 +104,8 @@ public class World : Singleton<World>
                     else if (negX.getBlock(CHUNK_WIDTH - 1, y, z) == 0 && negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) - 2 >= lightR)
                     {
 
-                        c.setLightLevelR((byte)(negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelR((byte)(negX.getLightLevelR(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
+                        qother = true;
 
                     }
 
@@ -115,8 +118,8 @@ public class World : Singleton<World>
                     else if (negX.getBlock(CHUNK_WIDTH - 1, y, z) == 0 && negX.getLightLevelG(CHUNK_WIDTH - 1, y, z) - 2 >= lightG)
                     {
 
-                        c.setLightLevelG((byte)(negX.getLightLevelG(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelG((byte)(negX.getLightLevelG(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
+                        qother = true;
 
 
                     }
@@ -130,8 +133,8 @@ public class World : Singleton<World>
                     else if (negX.getBlock(CHUNK_WIDTH - 1, y, z) == 0 && negX.getLightLevelB(CHUNK_WIDTH - 1, y, z) - 2 >= lightB)
                     {
 
-                        c.setLightLevelB((byte)(negX.getLightLevelB(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelB((byte)(negX.getLightLevelB(CHUNK_WIDTH - 1, y, z) - 1), x, y, z);
+                        qother = true;
 
 
                     }
@@ -141,10 +144,6 @@ public class World : Singleton<World>
                         lightBfsQueue.Enqueue(new LightNode(new Vector3(CHUNK_WIDTH - 1, y, z), negX));
                     }
 
-                    if (qthis)
-                    {
-                        lightBfsQueue.Enqueue(new LightNode(new Vector3(x, y, z), c));
-                    }
                     negX.markDirty(CHUNK_WIDTH - 1, y, z);
                 }
             }
@@ -182,7 +181,7 @@ public class World : Singleton<World>
                 if (posX != null)
                 {
                     bool qother = false;
-                    bool qthis = false;
+
                     if (posX.getBlock(0, y, z) == 0 && posX.getLightLevelR(0, y, z) + 2 <= lightR)
                     {
                         posX.setLightLevelR((byte)(lightR - 1), 0, y, z);
@@ -191,8 +190,8 @@ public class World : Singleton<World>
                     else if(posX.getBlock(0, y, z) == 0 && posX.getLightLevelR(0, y, z) - 2 >= lightR)
                     {
                         
-                        c.setLightLevelR((byte)(posX.getLightLevelR(0, y, z) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelR((byte)(posX.getLightLevelR(0, y, z) - 1), x, y, z);
+                        qother = true;
                     }
 
                     if (posX.getBlock(0, y, z) == 0 && posX.getLightLevelG(0, y, z) + 2 <= lightG)
@@ -203,8 +202,8 @@ public class World : Singleton<World>
                     else if (posX.getBlock(0, y, z) == 0 && posX.getLightLevelG(0, y, z) - 2 >= lightG)
                     {
 
-                        c.setLightLevelG((byte)(posX.getLightLevelG(0, y, z) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelG((byte)(posX.getLightLevelG(0, y, z) - 1), x, y, z);
+                        qother = true;
                     }
 
                     if (posX.getBlock(0, y, z) == 0 && posX.getLightLevelB(0, y, z) + 2 <= lightB)
@@ -215,8 +214,8 @@ public class World : Singleton<World>
                     else if (posX.getBlock(0, y, z) == 0 && posX.getLightLevelB(0, y, z) - 2 >= lightB)
                     {
 
-                        c.setLightLevelB((byte)(posX.getLightLevelB(0, y, z) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelB((byte)(posX.getLightLevelB(0, y, z) - 1), x, y, z);
+                        qother = true;
                     }
 
                     if (qother)
@@ -224,10 +223,7 @@ public class World : Singleton<World>
                         lightBfsQueue.Enqueue(new LightNode(new Vector3(0, y, z), posX));
                     }
 
-                    if (qthis)
-                    {
-                        lightBfsQueue.Enqueue(new LightNode(new Vector3(x, y, z), c));
-                    }
+
 
                     posX.markDirty(0, y, z);
                 }
@@ -268,7 +264,7 @@ public class World : Singleton<World>
                 if (negZ != null)
                 {
                     bool qother = false;
-                    bool qthis = false;
+
                     if (negZ.getBlock(x, y, CHUNK_LENGTH - 1) == 0 && negZ.getLightLevelR(x, y, CHUNK_LENGTH - 1) + 2 <= lightR)
                     {
                         negZ.setLightLevelR((byte)(lightR - 1), x, y, CHUNK_LENGTH - 1);
@@ -277,8 +273,11 @@ public class World : Singleton<World>
                     else if (negZ.getBlock(x, y, CHUNK_LENGTH - 1) == 0 && negZ.getLightLevelR(x, y, CHUNK_LENGTH - 1) - 2 >= lightR)
                     {
 
-                        c.setLightLevelR((byte)(negZ.getLightLevelR(x, y, CHUNK_LENGTH - 1) - 1), x, y, z);
-                         qthis = true;
+                        //c.setLightLevelR((byte)(negZ.getLightLevelR(x, y, CHUNK_LENGTH - 1) - 1), x, y, z);
+                        if(c.position.x == 1 && c.position.y == 2 && y < 48)
+                            Bobby.Log("test");
+                        qother = true;
+                        
 
                     }
                     if (negZ.getBlock(x, y, CHUNK_LENGTH - 1) == 0 && negZ.getLightLevelG(x, y, CHUNK_LENGTH - 1) + 2 <= lightG)
@@ -289,8 +288,8 @@ public class World : Singleton<World>
                     else if (negZ.getBlock(x, y, CHUNK_LENGTH - 1) == 0 && negZ.getLightLevelG(x, y, CHUNK_LENGTH - 1) - 2 >= lightG)
                     {
 
-                        c.setLightLevelG((byte)(negZ.getLightLevelG(x, y, CHUNK_LENGTH - 1) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelG((byte)(negZ.getLightLevelG(x, y, CHUNK_LENGTH - 1) - 1), x, y, z);
+                        qother = true;
 
                     }
 
@@ -302,8 +301,8 @@ public class World : Singleton<World>
                     else if (negZ.getBlock(x, y, CHUNK_LENGTH - 1) == 0 && negZ.getLightLevelB(x, y, CHUNK_LENGTH - 1) - 2 >= lightB)
                     {
 
-                        c.setLightLevelB((byte)(negZ.getLightLevelB(x, y, CHUNK_LENGTH - 1) - 1), x, y, z);
-                        qthis = true;
+                        //c.setLightLevelB((byte)(negZ.getLightLevelB(x, y, CHUNK_LENGTH - 1) - 1), x, y, z);
+                        qother = true;
 
                     }
                     if (qother)
@@ -311,10 +310,6 @@ public class World : Singleton<World>
                         lightBfsQueue.Enqueue(new LightNode(new Vector3(x, y, CHUNK_LENGTH - 1), negZ));
                     }
 
-                    if (qthis)
-                    {
-                        lightBfsQueue.Enqueue(new LightNode(new Vector3(x, y, z), c));
-                    }
 
                     negZ.markDirty(x, y, CHUNK_LENGTH - 1);
                 }
@@ -346,13 +341,12 @@ public class World : Singleton<World>
 
             if (z == CHUNK_LENGTH - 1)
             {
-                if (z == 0)
-                {
+                
                     Chunk posZ = World.Instance.getChunk((int)(c.position.x), (int)c.position.y + 1);
                     if (posZ != null)
                     {
                         bool qother = false;
-                        bool qthis = false;
+
                         if (posZ.getBlock(x, y, 0) == 0 && posZ.getLightLevelR(x, y, 0) + 2 <= lightR)
                         {
                             posZ.setLightLevelR((byte)(lightR - 1), x, y, 0);
@@ -361,8 +355,8 @@ public class World : Singleton<World>
                         else if (posZ.getBlock(x, y, 0) == 0 && posZ.getLightLevelR(x, y, 0) - 2 >= lightR)
                         {
 
-                            c.setLightLevelR((byte)(posZ.getLightLevelR(x, y, 0) - 1), x, y, z);
-                            qthis = true;
+                            //c.setLightLevelR((byte)(posZ.getLightLevelR(x, y, 0) - 1), x, y, z);
+                            qother = true;
                         }
                         if (posZ.getBlock(x, y, 0) == 0 && posZ.getLightLevelG(x, y, 0) + 2 <= lightG)
                         {
@@ -372,8 +366,8 @@ public class World : Singleton<World>
                         else if (posZ.getBlock(x, y, 0) == 0 && posZ.getLightLevelG(x, y, 0) - 2 >= lightG)
                         {
 
-                            c.setLightLevelG((byte)(posZ.getLightLevelG(x, y, 0) - 1), x, y, z);
-                            qthis = true;
+                            //c.setLightLevelG((byte)(posZ.getLightLevelG(x, y, 0) - 1), x, y, z);
+                            qother = true;
                         }
                         if (posZ.getBlock(x, y, 0) == 0 && posZ.getLightLevelB(x, y, 0) + 2 <= lightB)
                         {
@@ -383,8 +377,8 @@ public class World : Singleton<World>
                         else if (posZ.getBlock(x, y, 0) == 0 && posZ.getLightLevelB(x, y, 0) - 2 >= lightB)
                         {
 
-                            c.setLightLevelB((byte)(posZ.getLightLevelB(x, y, 0) - 1), x, y, z);
-                            qthis = true;
+                            //c.setLightLevelB((byte)(posZ.getLightLevelB(x, y, 0) - 1), x, y, z);
+                            qother = true;
                         }
 
                         if (qother)
@@ -392,13 +386,9 @@ public class World : Singleton<World>
                             lightBfsQueue.Enqueue(new LightNode(new Vector3(x, y, 0), posZ));
                         }
 
-                        if (qthis)
-                        {
-                            lightBfsQueue.Enqueue(new LightNode(new Vector3(x, y, z), c));
-                        }
                         posZ.markDirty(x, y, 0);
                     }
-                }
+                
             }
             else
             {

@@ -75,8 +75,8 @@ public class Chunk : MonoBehaviour
 
     void Start()
     {
-        
 
+        
 
         for (int i = 0; i < CHUNK_WIDTH; i++) {
             for (int j = 0; j < CHUNK_HEIGHT; j++) {
@@ -101,25 +101,25 @@ public class Chunk : MonoBehaviour
                         //if (Vector3.Distance(a, b) < 64)
                         {
                             //if (worldX == 0 && worldY == 0)
-                            if (worldY < 64)
-                                setBlock(1, i, j, k, false);
+                            //if (worldY < 64)
+                                //setBlock(1, i, j, k, false);
                         }
                     }
 
-                    if(worldX == 0 || worldX == 127 || worldZ == 0 || worldZ == 127 || worldY == 0)
+                    //if (worldX == 0 || worldX == 127 || worldZ == 0 || worldZ == 127 || worldY == 0)
                     {
                         if (worldY < 64)
                             setBlock(1, i, j, k, false);
                     }
-                    
-                    if(worldY == 64)
+
+                    if (worldY == 64)
                     {
                         if (worldX % 2 == 0 && worldZ % 2 == 1)
                         {
-                            setBlock(1, i, j, k, false);
+                            //setBlock(1, i, j, k, false);
                         }
                     }
-                        //setBlock(1, i, j, k, false);
+                    //setBlock(1, i, j, k, false);
 
 
                     // else
@@ -205,8 +205,8 @@ public class Chunk : MonoBehaviour
                             Color c = colors[(int)Random.Range(0, colors.Length)];
 
                             setLightLevelR((byte)((byte)c.r * 16), i, j, k);
-                            setLightLevelG((byte)((byte)c.g * 16), i, j, k);
-                            setLightLevelB((byte)((byte)c.b * 16), i, j, k);
+                            setLightLevelG((byte)((byte)c.r * 16), i, j, k);
+                            setLightLevelB((byte)((byte)c.r * 16), i, j, k);
                             World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
 
                         }
