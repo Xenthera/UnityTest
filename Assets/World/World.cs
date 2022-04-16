@@ -23,11 +23,15 @@ public class World : Singleton<World>
     public List<Vector4> debugCubes;
 
 
+    public Queue<Chunk> chunksNeedingRebuilt;
+    
     protected override void Awake()
     {
         debugCubes = new List<Vector4>();
         chunks = new Dictionary<(int, int), Chunk>();
         lightBfsQueue = new Queue<LightNode>();
+
+        chunksNeedingRebuilt = new Queue<Chunk>();
 
         Random.seed = 25;  
 
@@ -51,6 +55,8 @@ public class World : Singleton<World>
                     chunks.TryAdd((x, y), c);
 
                     chunk.transform.position = new Vector3(c.position.x * 16, 0, c.position.y * 16);
+                    
+                    chunksNeedingRebuilt.Enqueue(c);
 
                 //}).AppendInterval(0.01f);
                 
@@ -78,9 +84,18 @@ public class World : Singleton<World>
     // Update is called once per frame
     void Update()
     {
-        
 
         
+        
+    }
+
+    private void FixedUpdate()
+    {
+        if (chunksNeedingRebuilt.Count > 0)
+        {
+            Chunk c = chunksNeedingRebuilt.Dequeue();
+            c.LoadMesh();
+        }
     }
 
     private void OnDrawGizmos()

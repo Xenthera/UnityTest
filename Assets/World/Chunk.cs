@@ -25,6 +25,10 @@ public class Chunk : MonoBehaviour
 
     public static FastNoise fastNoise;
 
+    private static float time;
+
+    private Chunk negX, posX, negZ, posZ;
+    
     static Chunk(){
         fastNoise = new FastNoise();
     }
@@ -42,7 +46,7 @@ public class Chunk : MonoBehaviour
     private const int cwidth = 16, clength = 16, cheight = 16;
     private const int chunkStackHeight = CHUNK_HEIGHT / cheight; // 16 * 8 = 128;
 
-    
+        
     
    
 
@@ -68,7 +72,7 @@ public class Chunk : MonoBehaviour
             subChunk.transform.parent = gameObject.transform;
 
             subChunks.Add(subChunk.GetComponent<SubChunk>());
-            subChunkDirtyList[i] = true;
+            //subChunkDirtyList[i] = true;
         }
     }
 
@@ -88,21 +92,23 @@ public class Chunk : MonoBehaviour
                     int worldY = j;
                     int worldZ = (int)(k + (CHUNK_LENGTH * position.y));
 
-                    float frequency = 4.0f;
-
+                    //float frequency = 4.0f;
+//
 
 
                     //float rand = fastNoise.GetValueFractal(worldX * frequency, worldY * frequency, worldZ * frequency) * 0.6f;
-                    float thresh = World.Perlin3D(worldX * World.Instance.NoiseScale, worldY * World.Instance.NoiseScale, worldZ * World.Instance.NoiseScale);
-                    if (thresh > 0.5f)
-                    {
-                        //Vector3 a = new Vector3(worldX, worldY, worldZ);
-                        //Vector3 b = new Vector3((World.Instance.chunkLength * 16) / 2f, CHUNK_HEIGHT / 2f, (World.Instance.chunkLength * 16) / 2f);
-                        //if (Vector3.Distance(a, b) < 64)
+                    if (worldY < 64){
+                        float thresh = World.Perlin3D(worldX * World.Instance.NoiseScale, worldY * World.Instance.NoiseScale, worldZ * World.Instance.NoiseScale);
+                        if (thresh > 0.5f)
                         {
-                            //if (worldX == 0 && worldY == 0)
-                            if (worldY < 64)
-                                setBlock(1, i, j, k, false);
+                            //Vector3 a = new Vector3(worldX, worldY, worldZ);
+                            //Vector3 b = new Vector3((World.Instance.chunkLength * 16) / 2f, CHUNK_HEIGHT / 2f, (World.Instance.chunkLength * 16) / 2f);
+                            //if (Vector3.Distance(a, b) < 64)
+                            {
+                                //if (worldX == 0 && worldY == 0)
+                                
+                                    setBlock(1, i, j, k, false);
+                            }
                         }
                     }
 
@@ -321,26 +327,32 @@ public class Chunk : MonoBehaviour
 
         if (x == 0)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            if (nx != null)
+            if (negX == null)
+            {
+                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
+            }
+            if (negX != null)
             {
                 
-                if (Blocks.IsSolid(nx.getBlock(cwidth - 1, y, z)))
+                if (Blocks.IsSolid(negX.getBlock(cwidth - 1, y, z)))
                 {
 
-                    nx.subChunkDirtyList[chunkLocation] = true;
+                    negX.subChunkDirtyList[chunkLocation] = true;
                     //nx.regenerate();
                 }
             }
         }
         if (x == cwidth - 1)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            if (nx != null)
+            if (posX == null)
             {
-                if (Blocks.IsSolid(nx.getBlock(0, y, z)))
+                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
+            }
+            if (posX != null)
+            {
+                if (Blocks.IsSolid(posX.getBlock(0, y, z)))
                 {
-                    nx.subChunkDirtyList[chunkLocation] = true;
+                    posX.subChunkDirtyList[chunkLocation] = true;
                     //nx.regenerate();
                 }
             }
@@ -348,17 +360,17 @@ public class Chunk : MonoBehaviour
         if (z == 0)
         {    
 
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y - 1);
-
-
-
-                if (nz != null)
+            if (negZ == null)
             {
-                if (Blocks.IsSolid(nz.getBlock(x, y, clength - 1)))
+                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
+            }
+            if (negZ != null)
+            {
+                if (Blocks.IsSolid(negZ.getBlock(x, y, clength - 1)))
                 {
 
 
-                    nz.subChunkDirtyList[chunkLocation] = true;
+                    negZ.subChunkDirtyList[chunkLocation] = true;
                     //nz.regenerate();
                 }
             }
@@ -366,13 +378,16 @@ public class Chunk : MonoBehaviour
         if (z == clength - 1)
         {
 
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            if (nz != null)
+            if (posZ == null)
+            {
+                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
+            }
+            if (posZ != null)
             {
 
-                if (Blocks.IsSolid(nz.getBlock(x, y, 0)))
+                if (Blocks.IsSolid(posZ.getBlock(x, y, 0)))
                 {
-                    nz.subChunkDirtyList[chunkLocation] = true;
+                    posZ.subChunkDirtyList[chunkLocation] = true;
                     //nz.regenerate();
                 }
             }
@@ -388,15 +403,21 @@ public class Chunk : MonoBehaviour
 
     public byte getLightLevelR(int x, int y, int z)
     {
+
+        
         int chunkLocation = y / cheight;
         int blockLocation = y % cheight;
 
         if (x == -1)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            if (nx != null)
+            if (negX == null)
             {
-                return nx.getLightLevelR(cwidth - 1, y, z);
+                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
+            }
+
+            if (negX != null)
+            {
+                return negX.getLightLevelR(cwidth - 1, y, z);
             }
             else
             {
@@ -405,10 +426,13 @@ public class Chunk : MonoBehaviour
         }
         if (x == cwidth)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            if (nx != null)
+            if (posX == null)
             {
-                return nx.getLightLevelR(0, y, z);
+                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
+            }
+            if (posX != null)
+            {
+                return posX.getLightLevelR(0, y, z);
             }
             else
             {
@@ -417,10 +441,14 @@ public class Chunk : MonoBehaviour
         }
         if (z == -1)
         {
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y - 1);
-            if (nz != null)
+            if (negZ == null)
             {
-                return nz.getLightLevelR(x, y, clength - 1);
+                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
+            }
+
+            if (negZ != null)
+            {
+                return negZ.getLightLevelR(x, y, clength - 1);
             }
             else
             {
@@ -429,10 +457,13 @@ public class Chunk : MonoBehaviour
         }
         if (z == clength)
         {
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            if (nz != null)
+            if (posZ == null)
             {
-                return nz.getLightLevelR(x, y, 0);
+                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
+            }
+            if (posZ != null)
+            {
+                return posZ.getLightLevelR(x, y, 0);
             }
             else
             {
@@ -455,15 +486,20 @@ public class Chunk : MonoBehaviour
 
     public byte getLightLevelG(int x, int y, int z)
     {
+
         int chunkLocation = y / cheight;
         int blockLocation = y % cheight;
 
         if (x == -1)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            if (nx != null)
+            if (negX == null)
             {
-                return nx.getLightLevelG(cwidth - 1, y, z);
+                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
+            }
+            
+            if (negX != null)
+            {
+                return negX.getLightLevelG(cwidth - 1, y, z);
             }
             else
             {
@@ -472,10 +508,13 @@ public class Chunk : MonoBehaviour
         }
         if (x == cwidth)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            if (nx != null)
+            if (posX == null)
             {
-                return nx.getLightLevelG(0, y, z);
+                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
+            }
+            if (posX != null)
+            {
+                return posX.getLightLevelG(0, y, z);
             }
             else
             {
@@ -484,10 +523,13 @@ public class Chunk : MonoBehaviour
         }
         if (z == -1)
         {
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y - 1);
-            if (nz != null)
+            if (negZ == null)
             {
-                return nz.getLightLevelG(x, y, clength - 1);
+                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
+            }
+            if (negZ != null)
+            {
+                return negZ.getLightLevelG(x, y, clength - 1);
             }
             else
             {
@@ -496,10 +538,13 @@ public class Chunk : MonoBehaviour
         }
         if (z == clength)
         {
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            if (nz != null)
+            if (posZ == null)
             {
-                return nz.getLightLevelG(x, y, 0);
+                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
+            }
+            if (posZ != null)
+            {
+                return posZ.getLightLevelG(x, y, 0);
             }
             else
             {
@@ -522,15 +567,19 @@ public class Chunk : MonoBehaviour
 
     public byte getLightLevelB(int x, int y, int z)
     {
+
         int chunkLocation = y / cheight;
         int blockLocation = y % cheight;
 
         if (x == -1)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            if (nx != null)
+            if (negX == null)
             {
-                return nx.getLightLevelB(cwidth - 1, y, z);
+                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
+            }
+            if (negX != null)
+            {
+                return negX.getLightLevelB(cwidth - 1, y, z);
             }
             else
             {
@@ -539,10 +588,13 @@ public class Chunk : MonoBehaviour
         }
         if (x == cwidth)
         {
-            Chunk nx = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            if (nx != null)
+            if (posX == null)
             {
-                return nx.getLightLevelB(0, y, z);
+                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
+            }
+            if (posX != null)
+            {
+                return posX.getLightLevelB(0, y, z);
             }
             else
             {
@@ -551,10 +603,13 @@ public class Chunk : MonoBehaviour
         }
         if (z == -1)
         {
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y - 1);
-            if (nz != null)
+            if (negZ == null)
             {
-                return nz.getLightLevelB(x, y, clength - 1);
+                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
+            }
+            if (negZ != null)
+            {
+                return negZ.getLightLevelB(x, y, clength - 1);
             }
             else
             {
@@ -563,10 +618,13 @@ public class Chunk : MonoBehaviour
         }
         if (z == clength)
         {
-            Chunk nz = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            if (nz != null)
+            if (posZ == null)
             {
-                return nz.getLightLevelB(x, y, 0);
+                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
+            }
+            if (posZ != null)
+            {
+                return posZ.getLightLevelB(x, y, 0);
             }
             else
             {
@@ -635,6 +693,14 @@ public class Chunk : MonoBehaviour
         }
     }
 
+    public void LoadMesh()
+    {
+        for (int i = 0; i < chunkStackHeight; i++)
+        {
+            subChunks[i].SetMesh();
+        }
+    }
+
     public void regenerate() {
 
         
@@ -647,6 +713,8 @@ public class Chunk : MonoBehaviour
         Chunk chunkNegY = World.Instance.getChunk((int)position.x, (int)position.y - 1);
         Chunk chunkPosY = World.Instance.getChunk((int)position.x, (int)position.y + 1);
 
+        float t = Time.realtimeSinceStartup;
+        
         for (int i = 0; i < chunkStackHeight; i++) 
         {
             SubChunk s = subChunks[i];
@@ -756,8 +824,17 @@ public class Chunk : MonoBehaviour
                 }
                 subChunkDirtyList[i] = false;
             }
-            s.SetMesh();
+
+            
+            
+            
+            
+            
         }
+        
+        float t2 = Time.realtimeSinceStartup;
+            
+        Bobby.Log("To generate one chunk: " + (t2 - t));
     }
 
     
