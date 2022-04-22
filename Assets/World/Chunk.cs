@@ -23,12 +23,75 @@ public class Chunk : MonoBehaviour
         }
     }
 
+    public struct LightLevel
+    {
+        public byte r, g, b;
+        public LightLevel(int r, int g, int b)
+        {
+            this.r = (byte)r;
+            this.g = (byte)g;
+            this.b = (byte)b;
+        }
+    }
+
     public static FastNoise fastNoise;
+
+    public Chunk NegX
+    {
+        get
+        {
+            if (negX == null)
+            {
+                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
+            }
+
+            return negX;
+        }
+    }
+
+    public Chunk PosX
+    {
+        get
+        {
+            if (posX == null)
+            {
+                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
+            }
+
+            return posX;
+        }
+    }
+
+    public Chunk NegZ
+    {
+        get
+        {
+            if (negZ == null)
+            {
+                negZ = World.Instance.getChunk((int)position.x, (int)position.y - 1);
+            }
+
+            return negZ;
+        }
+    }
+
+    public Chunk PosZ
+    {
+        get
+        {
+            if (posZ == null)
+            {
+                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
+            }
+
+            return posZ;
+        }
+    }
 
     private static float time;
 
     private Chunk negX, posX, negZ, posZ;
-    
+
     static Chunk(){
         fastNoise = new FastNoise();
     }
@@ -36,6 +99,8 @@ public class Chunk : MonoBehaviour
     public GameObject SubChunk;
     public Material material = null;
     public Vector2 position;
+
+    public bool IsReadyForMesh = false;
 
 
 
@@ -54,7 +119,7 @@ public class Chunk : MonoBehaviour
 
     bool[] subChunkDirtyList;
 
-    private Color[] colors = new Color[] {new Color(1, 0, 0),new Color(0, 0, 1), new Color(0, 1, 0) };//, new Color(0, 0, 1)};
+    private Color[] colors = new Color[] { new Color(1, 0.9f, 0.8f) };//new Color(1, 0, 0),new Color(0, 0, 1), new Color(0, 1, 0) };//, new Color(0, 0, 1)};
 
 
 
@@ -82,9 +147,12 @@ public class Chunk : MonoBehaviour
 
         
 
-        for (int i = 0; i < CHUNK_WIDTH; i++) {
-            for (int j = 0; j < CHUNK_HEIGHT; j++) {
-                for (int k = 0; k < CHUNK_LENGTH; k++) {
+        for (int i = 0; i < CHUNK_WIDTH; i++) 
+        {
+            for (int j = 0; j < CHUNK_HEIGHT; j++) 
+            {
+                for (int k = 0; k < CHUNK_LENGTH; k++) 
+                {
                     
                     //setBlock(0, i, j, k, false);
         
@@ -92,65 +160,119 @@ public class Chunk : MonoBehaviour
                     int worldY = j;
                     int worldZ = (int)(k + (CHUNK_LENGTH * position.y));
 
-                    //float frequency = 4.0f;
-//
+
+
+                    //int height = (int)(Mathf.PerlinNoise(worldX * 0.005f, worldZ * 0.005f) * 90);
+                    //int height2 = (int)(Mathf.PerlinNoise(worldX * 0.02f, worldZ * 0.02f) * 32);
+                    ////int height3 = (int)(Mathf.PerlinNoise(worldX * 0.04f, worldZ * 0.04f) * 16);
+                    ////int height4 = (int)(Mathf.PerlinNoise(worldX * 0.08f, worldZ * 0.08f) * 8);
+                    ////int height5 = (int)(Mathf.PerlinNoise(worldX * 0.16f, worldZ * 0.16f) * 4);
+                    ////int height6 = (int)(Mathf.PerlinNoise(worldX * 0.32f, worldZ * 0.32f) * 2);
+                    ////int height7 = (int)(Mathf.PerlinNoise(worldX * 0.64f, worldZ * 0.64f));
+
+                    ////Bobby.Log("Height: " + height);
+
+                    //int final = height + height2;
+                    ////Vector2 a = new Vector2(worldX, worldZ);
+                    ////Vector2 b = new Vector2((World.Instance.chunkLength * 16) / 2f, (World.Instance.chunkLength * 16) / 2f);
+                    ////float dis = Vector2.Distance(a, b);
+
+                    ////dis /= ((World.Instance.chunkLength * 16) / 2f);
+
+                    //int  finalHeight = final + 3;
+
+                    //for (int j = final; j >= 0; j--)
+                    //{
+                    //    setBlock(1, i, j , k, false);
+
+
+                    //}
+
+                    
+
+
+
+
+
+                    float frequency = 4.0f;
+
 
 
                     //float rand = fastNoise.GetValueFractal(worldX * frequency, worldY * frequency, worldZ * frequency) * 0.6f;
-                    if (worldY < 64){
+                    //if (worldY < 64)
+                    {
                         float thresh = World.Perlin3D(worldX * World.Instance.NoiseScale, worldY * World.Instance.NoiseScale, worldZ * World.Instance.NoiseScale);
                         if (thresh > 0.5f)
                         {
-                            //Vector3 a = new Vector3(worldX, worldY, worldZ);
-                            //Vector3 b = new Vector3((World.Instance.chunkLength * 16) / 2f, CHUNK_HEIGHT / 2f, (World.Instance.chunkLength * 16) / 2f);
-                            //if (Vector3.Distance(a, b) < 64)
-                            {
-                                //if (worldX == 0 && worldY == 0)
-                                
-                                    setBlock(1, i, j, k, false);
-                            }
+
+                            //if (worldX == 0 && worldY == 0)
+
+                            setBlock(1, i, j, k, false);
                         }
                     }
 
-                    if (worldX == 0 || worldX == 127 || worldZ == 0 || worldZ == 127 || worldY == 0)
+
+                    if (worldX == 0 || worldX == 384 || worldZ == 0 || worldZ == 384 || worldY == 0)
                     {
                         //if (worldY < 64)
-                            //setBlock(1, i, j, k, false);
+                        setBlock(1, i, j, k, false);
                     }
 
-                    if (worldY == 64)
+                    if (worldY == 127)
                     {
                         if (worldX % 2 == 0 && worldZ % 2 == 1)
                         {
-                            //setBlock(1, i, j, k, false);
+                            setBlock(1, i, j, k, false);
                         }
                     }
 
-                    if (worldY < 4 &&  worldY > 0 && worldX > 63 && worldX < 67)
+
+
+
+
+                    int block = getBlock(i, j, k);
+
+                    if (block == Blocks.AIR && Random.Range(0f, 1f) < 0.0001f)
+                    //if(worldX == 32 && worldZ == 32)
                     {
-                        //setBlock(0, i,j,k,false);
+                        if (Random.Range(0f, 1f) > 0.5f)
+                        {
+                            setLightLevel(new LightLevel(16, 16, 16), i, j, k);
+                        }
+                        else
+                        {
+                            setLightLevel(new LightLevel(16, 0, 0), i, j, k);
+
+                        }
+
+                        World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
+
+                        setBlock(1, i, j, k, false);
                     }
-                    //setBlock(1, i, j, k, false);
 
-
-                    // else
-                    // {
-                    //     this.setBlock(Random.Range(0f, 1f) < 0.1 ? 1 : 0, i, j, k, false);
-                    // }
+                    //if (worldY < 4 && worldY > 0 && worldX > 63 && worldX < 67)
+                    //{
+                    //    //setBlock(0, i,j,k,false);
+                    //    setBlock(1, i, j, k, false);
                     //}
-
-                    //if(j == 254){
-                    //if(applet.random(1) >= .5f){
-                    //this.setBlock(Blocks.BEDROCK, i, j, k, false);
-                    //}
-                    //}
-
-                    //if(j == 255){
-                    //this.setBlock(Blocks.BEDROCK, i, j, k, false);
+                    //else
+                    //{
+                    //    this.setBlock(Random.Range(0f, 1f) < 0.1 ? 1 : 0, i, j, k, false);
                     //}
                 }
 
-            }
+        //if(j == 254){
+        //if(applet.random(1) >= .5f){
+        //this.setBlock(Blocks.BEDROCK, i, j, k, false);
+        //}
+        //}
+
+        //if(j == 255){
+        //this.setBlock(Blocks.BEDROCK, i, j, k, false);
+        //}
+    }
+
+            //}
         }
 
 
@@ -161,10 +283,10 @@ public class Chunk : MonoBehaviour
                 for (int k = 0; k < CHUNK_LENGTH; k++)
                 {
                     int worldX = (int)(i + (CHUNK_WIDTH * position.x));
-                    int worldY = j;
+                    //int worldY = j;
                     int worldZ = (int)(k + (CHUNK_LENGTH * position.y));
 
-                    int block = getBlock(i, j, k);
+
 
                     //if (block == Blocks.AIR)
                     //{
@@ -199,36 +321,36 @@ public class Chunk : MonoBehaviour
                     //    }
                     //}
 
-                    if (block == Blocks.AIR)
-                    {
-                        //setLightLevelR(0, i, j, k);
-                        //setLightLevelG(0, i, j, k);
-                        //setLightLevelB(0, i, j, k);
-                        if(i == 0 || i == CHUNK_WIDTH || k == 0 || k == CHUNK_LENGTH)
-                            World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
-                    }
+                    //if (block == Blocks.AIR)
+                    //{
+                    //    //setLightLevelR(0, i, j, k);
+                    //    //setLightLevelG(0, i, j, k);
+                    //    //setLightLevelB(0, i, j, k);
+                    //    //if(i == 0 || i == CHUNK_WIDTH || k == 0 || k == CHUNK_LENGTH)
+                    //        //World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
+                    //}
 
-                    if (j < 66 && Random.Range(0f, 1f) < 0.0005f)
-                    {
+                    //if (j < 66 && Random.Range(0f, 1f) < 0.0005f)
+                    //{
 
-                        if (block == Blocks.AIR)
-                        {
+                    //    if (block == Blocks.AIR)
+                    //    {
 
-                            Color c = colors[(int)Random.Range(0, colors.Length)];
+                    //        Color c = colors[(int)Random.Range(0, colors.Length)];
 
-                            setLightLevelR((byte)((byte)c.r * 16), i, j, k);
-                            setLightLevelG((byte)((byte)c.g * 16), i, j, k);
-                            setLightLevelB((byte)((byte)c.b * 16), i, j, k);
-                            setBlock(1, i, j, k, false);
-                            World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
+                    //        setLightLevelR((byte)(c.r * 16), i, j, k);
+                    //        setLightLevelG((byte)(c.g * 16), i, j, k);
+                    //        setLightLevelB((byte)(c.b * 16), i, j, k);
+                    //        setBlock(1, i, j, k, false);
+                    //        World.Instance.lightBfsQueue.Enqueue(new LightNode(new Vector3(i, j, k), this));
 
-                        }
+                    //    }
 
-                    }
-                    else
-                    {
+                    //}
+                    //else
+                    //{
 
-                    }
+                    //}
 
 
 
@@ -278,7 +400,7 @@ public class Chunk : MonoBehaviour
         return true;
     }
 
-    private bool isDirty()
+    public bool IsDirty()
     {
         for (int i = 0; i < subChunkDirtyList.Length; i++)
         {
@@ -290,19 +412,13 @@ public class Chunk : MonoBehaviour
         return false;
     }
 
-    private void Update()
-    {
-        if (isDirty())
-        {
-            regenerate();
-        }
-    }
+
 
     public void setBlock(int block, int x, int y, int z, bool setByUser) {
         int chunkLocation = y / cwidth;
         int blockLocation = y % cwidth;
 
-        if(x < 0 || y < 0 || z < 0 || x > cwidth - 1 || y > 256 - 1 || z > clength - 1){
+        if(x < 0 || y < 0 || z < 0 || x > cwidth - 1 || y > CHUNK_HEIGHT - 1 || z > clength - 1){
             return;
         }
 
@@ -327,70 +443,36 @@ public class Chunk : MonoBehaviour
 
         if (x == 0)
         {
-            if (negX == null)
-            {
-                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            }
-            if (negX != null)
-            {
-                
-                if (Blocks.IsSolid(negX.getBlock(cwidth - 1, y, z)))
+            if(NegX != null)
+                if (Blocks.IsSolid(NegX.getBlock(cwidth - 1, y, z)))
                 {
-
-                    negX.subChunkDirtyList[chunkLocation] = true;
-                    //nx.regenerate();
+                    NegX.subChunkDirtyList[chunkLocation] = true;
                 }
-            }
         }
         if (x == cwidth - 1)
         {
-            if (posX == null)
-            {
-                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            }
-            if (posX != null)
-            {
-                if (Blocks.IsSolid(posX.getBlock(0, y, z)))
+            if (PosX != null)
+                if (Blocks.IsSolid(PosX.getBlock(0, y, z)))
                 {
-                    posX.subChunkDirtyList[chunkLocation] = true;
-                    //nx.regenerate();
+                    PosX.subChunkDirtyList[chunkLocation] = true;
                 }
-            }
         }
         if (z == 0)
-        {    
-
-            if (negZ == null)
-            {
-                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
-            }
-            if (negZ != null)
-            {
-                if (Blocks.IsSolid(negZ.getBlock(x, y, clength - 1)))
+        {
+            if (NegZ != null)
+                if (Blocks.IsSolid(NegZ.getBlock(x, y, clength - 1)))
                 {
-
-
-                    negZ.subChunkDirtyList[chunkLocation] = true;
-                    //nz.regenerate();
+                    NegZ.subChunkDirtyList[chunkLocation] = true;
                 }
-            }
+            
         }
         if (z == clength - 1)
         {
-
-            if (posZ == null)
-            {
-                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            }
-            if (posZ != null)
-            {
-
-                if (Blocks.IsSolid(posZ.getBlock(x, y, 0)))
+            if (PosZ != null)
+                if (Blocks.IsSolid(PosZ.getBlock(x, y, 0)))
                 {
-                    posZ.subChunkDirtyList[chunkLocation] = true;
-                    //nz.regenerate();
+                    PosZ.subChunkDirtyList[chunkLocation] = true;
                 }
-            }
         }
 
     }
@@ -401,274 +483,80 @@ public class Chunk : MonoBehaviour
         return subChunks[chunkLocation].data[x, blockLocation, z];
     }
 
-    public byte getLightLevelR(int x, int y, int z)
+    public LightLevel getLightLevel(int x, int y, int z)
     {
-
-        
         int chunkLocation = y / cheight;
         int blockLocation = y % cheight;
 
         if (x == -1)
         {
-            if (negX == null)
-            {
-                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            }
 
-            if (negX != null)
+
+            if (NegX != null)
             {
-                return negX.getLightLevelR(cwidth - 1, y, z);
+                return NegX.getLightLevel(cwidth - 1, y, z);
             }
             else
             {
-                return 16;
+                return new LightLevel(16,16,16);
             }
         }
         if (x == cwidth)
         {
-            if (posX == null)
+            if (PosX != null)
             {
-                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            }
-            if (posX != null)
-            {
-                return posX.getLightLevelR(0, y, z);
+                return PosX.getLightLevel(0, y, z);
             }
             else
             {
-                return 16;
+                return new LightLevel(16, 16, 16);
             }
         }
         if (z == -1)
         {
-            if (negZ == null)
+            if (NegZ != null)
             {
-                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
-            }
-
-            if (negZ != null)
-            {
-                return negZ.getLightLevelR(x, y, clength - 1);
+                return NegZ.getLightLevel(x, y, clength - 1);
             }
             else
             {
-                return 16;
+                return new LightLevel(16, 16, 16);
             }
         }
         if (z == clength)
         {
-            if (posZ == null)
+            if (PosZ != null)
             {
-                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            }
-            if (posZ != null)
-            {
-                return posZ.getLightLevelR(x, y, 0);
+                return PosZ.getLightLevel(x, y, 0);
             }
             else
             {
-                return 16;
+                return new LightLevel(16, 16, 16);
             }
         }
 
         if (y == -1)
         {
-            return 4;
+            return new LightLevel(4,4,4);
         }
 
         if (y == CHUNK_HEIGHT)
         {
-            return 16;
+            return new LightLevel(16,16,16);
         }
 
-        return subChunks[chunkLocation].lightInfoR[x, blockLocation, z];
+        SubChunk s = subChunks[chunkLocation];
+
+        return new LightLevel(s.lightInfoR[x, blockLocation, z], s.lightInfoG[x, blockLocation, z], s.lightInfoB[x, blockLocation, z]);
     }
-
-    public byte getLightLevelG(int x, int y, int z)
-    {
-
-        int chunkLocation = y / cheight;
-        int blockLocation = y % cheight;
-
-        if (x == -1)
-        {
-            if (negX == null)
-            {
-                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            }
-            
-            if (negX != null)
-            {
-                return negX.getLightLevelG(cwidth - 1, y, z);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-        if (x == cwidth)
-        {
-            if (posX == null)
-            {
-                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            }
-            if (posX != null)
-            {
-                return posX.getLightLevelG(0, y, z);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-        if (z == -1)
-        {
-            if (negZ == null)
-            {
-                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
-            }
-            if (negZ != null)
-            {
-                return negZ.getLightLevelG(x, y, clength - 1);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-        if (z == clength)
-        {
-            if (posZ == null)
-            {
-                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            }
-            if (posZ != null)
-            {
-                return posZ.getLightLevelG(x, y, 0);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-
-        if (y == -1)
-        {
-            return 4;
-        }
-
-        if (y == CHUNK_HEIGHT)
-        {
-            return 16;
-        }
-
-        return subChunks[chunkLocation].lightInfoG[x, blockLocation, z];
-    }
-
-    public byte getLightLevelB(int x, int y, int z)
-    {
-
-        int chunkLocation = y / cheight;
-        int blockLocation = y % cheight;
-
-        if (x == -1)
-        {
-            if (negX == null)
-            {
-                negX = World.Instance.getChunk((int)position.x - 1, (int)position.y);
-            }
-            if (negX != null)
-            {
-                return negX.getLightLevelB(cwidth - 1, y, z);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-        if (x == cwidth)
-        {
-            if (posX == null)
-            {
-                posX = World.Instance.getChunk((int)position.x + 1, (int)position.y);
-            }
-            if (posX != null)
-            {
-                return posX.getLightLevelB(0, y, z);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-        if (z == -1)
-        {
-            if (negZ == null)
-            {
-                negZ = World.Instance.getChunk((int) position.x, (int) position.y - 1);
-            }
-            if (negZ != null)
-            {
-                return negZ.getLightLevelB(x, y, clength - 1);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-        if (z == clength)
-        {
-            if (posZ == null)
-            {
-                posZ = World.Instance.getChunk((int)position.x, (int)position.y + 1);
-            }
-            if (posZ != null)
-            {
-                return posZ.getLightLevelB(x, y, 0);
-            }
-            else
-            {
-                return 16;
-            }
-        }
-
-        if (y == -1)
-        {
-            return 4;
-        }
-
-        if (y == CHUNK_HEIGHT)
-        {
-            return 16;
-        }
-
-        return subChunks[chunkLocation].lightInfoB[x, blockLocation, z];
-    }
-    public void setLightLevelR(byte level, int posx, int posy, int posz)
+   
+    public void setLightLevel(LightLevel light, int posx, int posy, int posz)
     {
         int chunkLocation = posy / cheight;
         int blockLocation = posy % cheight;
-        subChunks[chunkLocation].lightInfoR[posx, blockLocation, posz] = level;
-
-        subChunkDirtyList[chunkLocation] = true;
-
-    }
-
-    public void setLightLevelG(byte level, int posx, int posy, int posz)
-    {
-        int chunkLocation = posy / cheight;
-        int blockLocation = posy % cheight;
-        subChunks[chunkLocation].lightInfoG[posx, blockLocation, posz] = level;
-
-        subChunkDirtyList[chunkLocation] = true;
-
-    }
-
-    public void setLightLevelB(byte level, int posx, int posy, int posz)
-    {
-        int chunkLocation = posy / cheight;
-        int blockLocation = posy % cheight;
-        subChunks[chunkLocation].lightInfoB[posx, blockLocation, posz] = level;
+        subChunks[chunkLocation].lightInfoR[posx, blockLocation, posz] = light.r;
+        subChunks[chunkLocation].lightInfoG[posx, blockLocation, posz] = light.g;
+        subChunks[chunkLocation].lightInfoB[posx, blockLocation, posz] = light.b;
 
         subChunkDirtyList[chunkLocation] = true;
 
@@ -703,7 +591,7 @@ public class Chunk : MonoBehaviour
 
     public void regenerate() {
 
-        
+  
 
         Faces faces = new Faces();
 
@@ -815,6 +703,8 @@ public class Chunk : MonoBehaviour
 
                             ChunkGeometry.ConstructBlock(getBlock(x, y, z), this, ref s, faces, x, y, z);
 
+                            
+
                            
 
                             //meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
@@ -822,6 +712,7 @@ public class Chunk : MonoBehaviour
                         }
                     }
                 }
+
                 subChunkDirtyList[i] = false;
             }
 
@@ -834,7 +725,9 @@ public class Chunk : MonoBehaviour
         
         float t2 = Time.realtimeSinceStartup;
             
-        Bobby.Log("To generate one chunk: " + (t2 - t));
+
+
+        IsReadyForMesh = true;
     }
 
     

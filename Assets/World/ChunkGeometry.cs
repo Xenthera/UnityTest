@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Chunk;
 
 public static class ChunkGeometry 
 {
@@ -125,10 +126,6 @@ public static class ChunkGeometry
     
     public static void ConstructBlock(int block, Chunk chunk, ref SubChunk subChunk, Faces faces, int x, int y, int z)
     {
-
-        
-
-        
         if (faces.back)
             constructBack(block, chunk, ref subChunk.Vertices, ref subChunk.Triangles, ref subChunk.Colors, ref subChunk.Uvs, faces, x, y, z);
         if(faces.right)
@@ -145,11 +142,11 @@ public static class ChunkGeometry
     
     private static void constructBack(int block, Chunk chunk, ref List<Vector3> verts, ref List<int> inds, ref List<Color> cols, ref List<Vector2> uvs, Faces faces, int x, int y, int z) {
 
-        
+        LightLevel light = chunk.getLightLevel(x, y, z - 1);
 
-        float r = chunk.getLightLevelR(x , y, z-1) / 16f;
-        float g = chunk.getLightLevelG(x, y, z-1) / 16f;
-        float b = chunk.getLightLevelB(x, y, z-1) / 16f;
+        float r = light.r / 16f;
+        float g = light.g / 16f;
+        float b = light.b / 16f;
 
         curColor.r = r + 0.1f;
         curColor.g = g + 0.1f;
@@ -167,9 +164,10 @@ public static class ChunkGeometry
     }
     private static void constructRight(int block, Chunk chunk, ref List<Vector3> verts, ref List<int> inds, ref List<Color> cols, ref List<Vector2> uvs, Faces faces, int x, int y, int z) {
 
-        float r = chunk.getLightLevelR(x + 1, y, z) / 16f;
-        float g = chunk.getLightLevelG(x + 1, y, z) / 16f;
-        float b = chunk.getLightLevelB(x + 1, y, z) / 16f;
+        LightLevel light = chunk.getLightLevel(x + 1, y, z);
+        float r = light.r / 16f;
+        float g = light.g / 16f;
+        float b = light.b / 16f;
         curColor.r = r + 0.1f;
         curColor.g = g + 0.1f;
         curColor.b = b + 0.1f;
@@ -184,9 +182,10 @@ public static class ChunkGeometry
     }
     
     private static void constructFront(int block, Chunk chunk, ref List<Vector3> verts, ref List<int> inds, ref List<Color> cols, ref List<Vector2> uvs, Faces faces, int x, int y, int z) {
-        float r = chunk.getLightLevelR(x, y, z + 1) / 16f;
-        float g = chunk.getLightLevelG(x, y, z + 1) / 16f;
-        float b = chunk.getLightLevelB(x, y, z + 1) / 16f;
+        LightLevel light = chunk.getLightLevel(x, y, z + 1);
+        float r = light.r / 16f;
+        float g = light.g / 16f;
+        float b = light.b / 16f;
 
         curColor.r = r + 0.1f;
         curColor.g = g + 0.1f;
@@ -202,9 +201,10 @@ public static class ChunkGeometry
     }
     
     private static void constructLeft(int block, Chunk chunk, ref List<Vector3> verts, ref List<int> inds, ref List<Color> cols, ref List<Vector2> uvs, Faces faces, int x, int y, int z) {
-        float r = chunk.getLightLevelR(x - 1, y, z) / 16f;
-        float g = chunk.getLightLevelG(x - 1, y, z) / 16f;
-        float b = chunk.getLightLevelB(x - 1, y, z) / 16f;
+        LightLevel light = chunk.getLightLevel(x - 1, y, z);
+        float r = light.r / 16f;
+        float g = light.g / 16f;
+        float b = light.b / 16f;
 
         curColor.r = r + 0.1f;
         curColor.g = g + 0.1f;
@@ -220,9 +220,10 @@ public static class ChunkGeometry
     }
     
     private static void constructTop(int block, Chunk chunk, ref List<Vector3> verts, ref List<int> inds, ref List<Color> cols, ref List<Vector2> uvs, Faces faces, int x, int y, int z) {
-        float r = chunk.getLightLevelR(x, y + 1, z) / 16f;
-        float g = chunk.getLightLevelG(x, y + 1, z) / 16f;
-        float b = chunk.getLightLevelB(x, y + 1, z) / 16f;
+        LightLevel light = chunk.getLightLevel(x, y + 1, z);
+        float r = light.r / 16f;
+        float g = light.g / 16f;
+        float b = light.b / 16f;
 
         curColor.r = r + 0.1f;
         curColor.g = g + 0.1f;
@@ -238,9 +239,10 @@ public static class ChunkGeometry
     }
     
     private static void constructBottom(int block, Chunk chunk, ref List<Vector3> verts, ref List<int> inds, ref List<Color> cols, ref List<Vector2> uvs, Faces faces, int x, int y, int z) {
-        float r = chunk.getLightLevelR(x, y - 1, z) / 16f;
-        float g = chunk.getLightLevelG(x, y - 1, z) / 16f;
-        float b = chunk.getLightLevelB(x, y - 1, z) / 16f;
+        LightLevel light = chunk.getLightLevel(x, y - 1, z);
+        float r = light.r / 16f;
+        float g = light.g / 16f;
+        float b = light.b / 16f;
 
         curColor.r = r + 0.1f;
         curColor.g = g + 0.1f;
